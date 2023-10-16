@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Sprites/MapEnvironment/ParadiseEnvironment.png" type="Texture" id=1]
+
+[node name="ParadiseBush" type="Node2D"]
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 0, -4 )
+texture = ExtResource( 1 )
+region_enabled = true
+region_rect = Rect2( 71.6624, 15.8392, 12.0801, 8.48181 )

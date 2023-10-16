@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Area2D
+
+export (NodePath) var Target : NodePath
+
+func Teleport(Obj) -> void:
+	if not is_instance_valid(get_node_or_null(Target)): return
+	if not is_instance_valid(Obj): return
+	
+	Obj.global_transform.origin = get_node(Target).global_transform.origin
+
+func _process(Delta : float) -> void:
+	if Input.is_action_just_pressed(\"ui_a\"):
+		for O in get_overlapping_bodies():
+			if O.is_in_group(\"Player\"):
+				Teleport(O)
+			
+	
+
+
+func _on_EnterArea_body_entered(Body):
+	if Body.is_in_group(\"Player\"):
+		G.HUD.ActivateElement(\"MainLabel\", \"Press LMB to enter\")
+	
+"
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 6.0
+
+[node name="EnterArea" type="Area2D"]
+script = SubResource( 1 )
+
+[node name="CollisionShape" type="CollisionShape2D" parent="."]
+shape = SubResource( 2 )
+
+[connection signal="body_entered" from="." to="." method="_on_EnterArea_body_entered"]

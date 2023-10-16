@@ -1,0 +1,156 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Resources/Theme/MainTheme.tres" type="Theme" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+onready var Elements : Dictionary = {
+	\"MainLabel\": {
+		\"Link\": $MainLabel,
+		\"Shown\": false,
+		\"Timer\": $MainLabel/Timer
+	}
+}
+
+#--My Methods--
+func ActivateElement(ElementName : String, Data : String) -> void:
+	if not Elements.has(ElementName):
+		print(\"Trying to call unreal HUD element (\" + ElementName + \")!\")
+		return
+	
+	if Elements [ElementName].has(\"Shown\"):
+		Elements [ElementName] [\"Shown\"] = true
+	
+	if Elements [ElementName].has(\"Link\"):
+		Elements [ElementName].Link.SetContent(Data)
+		
+	
+	
+
+#System Methods
+
+func _ready() -> void:
+	G.HUD = self
+	visible = true
+
+func _process(delta) -> void:
+	rect_global_position = -(get_viewport().canvas_transform.origin)
+	
+	#-Main Label-
+	$MainLabel.rect_size.x = get_viewport_rect().size.x * 0.6
+	$MainLabel.rect_size.y = get_viewport_rect().size.y * 0.15
+	
+	$MainLabel.rect_position.x = ((get_viewport_rect().size.x * 0.4) / 2)
+	$MainLabel/Label.rect_position.x = $MainLabel.rect_size.x / 2
+	
+	if Elements [\"MainLabel\"] [\"Shown\"]:
+		$MainLabel.rect_position.y = lerp($MainLabel.rect_position.y,
+			(get_viewport_rect().size.y - $MainLabel.rect_size.y
+			- get_viewport_rect().size.y * 0.1),
+			0.1
+		)
+	else:
+		$MainLabel.rect_position.y = lerp($MainLabel.rect_position.y,
+			(get_viewport_rect().size.y),
+			0.1
+		)
+	
+	#Debug Label
+	
+	if is_instance_valid(Game.Player):
+		$DebugInfo/Label.text = \"\"\"FPS: {FPS};
+Position: X {X}, Y {Y};
+Current Location: {Location};
+G.Permissions:
+   Move: {Move};
+   Interact: {Interact};\"\"\".format({\"FPS\": str(Engine.get_frames_per_second()),
+		\"X\": str(int(Game.Player.global_transform.origin.x)),
+		\"Y\": str(int(Game.Player.global_transform.origin.y)),
+		\"Location\": Game.CurLocation,
+		\"Move\": str(Game.Permissions [\"Move\"]),
+		\"Interact\": str(Game.Permissions [\"Interact\"])
+		})
+	
+	#------------
+	
+
+func _MainLabelTimer() -> void:
+	Elements [\"MainLabel\"] [\"Shown\"] = false
+
+"
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Panel
+
+func SetContent(Data : String = \"\") -> void:
+	$Label/Label.text = Data
+	
+	$Timer.wait_time = len(Data) * 0.1
+	$Timer.start()
+	
+"
+
+[node name="HUD" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -2.0
+script = SubResource( 1 )
+
+[node name="MainLabel" type="Panel" parent="."]
+self_modulate = Color( 1, 1, 1, 0.392157 )
+margin_top = 78.0
+margin_right = 180.0
+margin_bottom = 96.0
+theme = ExtResource( 1 )
+script = SubResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Timer" type="Timer" parent="MainLabel"]
+one_shot = true
+
+[node name="Label" type="Control" parent="MainLabel"]
+margin_left = 90.0
+margin_right = 130.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="MainLabel/Label"]
+margin_left = -90.0
+margin_top = 3.0
+margin_right = 510.0
+margin_bottom = 43.0
+rect_scale = Vector2( 0.3, 0.3 )
+text = "Hello World, this is my text for in-editor test"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DebugInfo" type="Panel" parent="."]
+self_modulate = Color( 1, 1, 1, 0.392157 )
+margin_right = 36.0
+margin_bottom = 24.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="DebugInfo"]
+margin_right = 171.0
+margin_bottom = 99.0
+rect_scale = Vector2( 0.2, 0.2 )
+text = "FPS: 0;
+Position: X 1, Y 1;
+Current Location: Paradise;
+G.Permissions:
+   Move: true;
+   Interact: true;"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="timeout" from="MainLabel/Timer" to="." method="_MainLabelTimer"]

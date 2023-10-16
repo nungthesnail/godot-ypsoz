@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Resources/Tilemaps/Interiors/HouseInterior.png" type="Texture" id=1]
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends StaticBody2D
+
+export (Array) var Content : Array = []
+
+func _ready() -> void:
+	pass
+"
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 12, 3 )
+
+[node name="Wardrobe" type="StaticBody2D"]
+script = SubResource( 2 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( -0.5, -12 )
+texture = ExtResource( 1 )
+region_enabled = true
+region_rect = Rect2( 12, 24, 23, 24 )
+
+[node name="CollisionShape" type="CollisionShape2D" parent="."]
+position = Vector2( -0.5, -3 )
+shape = SubResource( 1 )

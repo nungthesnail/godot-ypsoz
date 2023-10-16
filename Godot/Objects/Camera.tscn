@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Camera2D
+
+export (NodePath) var Target : NodePath
+
+var T : KinematicBody2D
+
+func _ready() -> void:
+	T = get_node(Target)
+	G.CurCamera = self
+
+func _process(delta) -> void:
+	global_position = T.global_position
+	#global_position -= Vector2(
+	#	get_viewport_rect().size.x / 2,
+	#	get_viewport_rect().size.y / 2
+	#)
+"
+
+[node name="Camera" type="Camera2D"]
+position = Vector2( -264, -312 )
+anchor_mode = 0
+current = true
+smoothing_enabled = true
+script = SubResource( 1 )
+Target = NodePath("../World/Objects/Player")
